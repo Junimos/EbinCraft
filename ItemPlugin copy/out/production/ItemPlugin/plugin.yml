@@ -1,0 +1,7 @@
+name: itemClick
+version: 1.0
+author: chris
+main: com.Chris.ItemClick.itemClick
+api-version: 1.14
+commands:
+  sticktool:
