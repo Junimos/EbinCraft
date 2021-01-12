@@ -14,9 +14,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +30,8 @@ public class itemClick extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		this.getServer().getPluginManager().registerEvents(this, this);
+		this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+
 
 	}
 
@@ -38,7 +44,7 @@ public class itemClick extends JavaPlugin implements Listener {
 		if (label.equalsIgnoreCase("sticktool")) {
 			if (!(sender instanceof Player)) {
 				sender.sendMessage(ChatColor.DARK_RED + "For players only!");
-				return true;
+				return false;
 			}
 			Player player = (Player) sender;
 			if (player.getInventory().firstEmpty() == -1) {
@@ -82,14 +88,21 @@ public class itemClick extends JavaPlugin implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
-		Entity entity = event.getRightClicked();
-		if ((entity instanceof Villager)) {
-			Player player = event.getPlayer();
-			player.sendMessage(ChatColor.GOLD + "fuck you justin, you suck dirty ass");
-			player.chat("/server games");
+		if (event.getHand().equals(EquipmentSlot.HAND)) {
+			Entity entity = event.getRightClicked();
+			if (entity instanceof Villager) {
+				Player player = event.getPlayer();
+				player.sendMessage(ChatColor.GOLD + "fuck you justin, you suck dirty ass");
+				
+			    ByteArrayDataOutput out = ByteStreams.newDataOutput();
+			    out.writeUTF("Connect");
+			    out.writeUTF("games");
+			    player.sendPluginMessage(this, "BungeeCord", out.toByteArray());
+			}
 		}
+
 	}
 }
